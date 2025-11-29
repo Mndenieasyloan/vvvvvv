@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Cryptocurrency Investment Plans - V0 Trade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -12,7 +12,7 @@
     </style>
 </head>
 <body class="bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950 text-white">
-    <!-- Updated header with dropdown menu -->
+    <!-- Header -->
     <header class="sticky top-0 z-50 border-b border-purple-500/20 bg-slate-950/80 backdrop-blur-md">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between py-4">
@@ -49,7 +49,7 @@
         </div>
     </header>
 
-    <!-- New hero section -->
+    <!-- Hero -->
     <section class="px-4 py-24 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-5xl text-center">
             <h1 class="text-5xl sm:text-6xl font-bold text-white mb-6">Cryptocurrency Investment Plans</h1>
@@ -58,12 +58,11 @@
         </div>
     </section>
 
-    <!-- About crypto investment section -->
+    <!-- About -->
     <section class="px-4 py-16 sm:px-6 lg:px-8 bg-slate-900/30">
         <div class="mx-auto max-w-7xl">
             <h2 class="text-4xl font-bold text-white text-center mb-6">About Crypto Investment</h2>
             <p class="text-xl text-gray-300 text-center max-w-4xl mx-auto mb-12">Cryptocurrency investment with V0 Trade offers fast-return opportunities across major digital assets. Our platform supports a diverse range of cryptocurrencies, allowing you to build a diversified crypto portfolio.</p>
-            
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div class="bg-slate-900/50 border border-purple-500/20 rounded-xl p-6 text-center">
                     <div class="text-4xl mb-3">₿</div>
@@ -109,33 +108,24 @@
         </div>
     </section>
 
-    <!-- Investment plans with forms -->
+    <!-- Investment Plans -->
     <section class="px-4 py-24 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-7xl">
             <h2 class="text-4xl font-bold text-white text-center mb-16">Investment Plans</h2>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
+
                 <!-- 1 Hour Plan -->
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl p-8">
+                <div class="plan-card bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl p-8">
                     <h3 class="text-2xl font-bold text-white mb-6">1 Hour Plan</h3>
                     <div class="space-y-4 mb-6">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">ROI</span>
-                            <span class="text-green-400 font-bold">+20%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Duration</span>
-                            <span class="text-white font-semibold">1 Hour</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Withdrawal</span>
-                            <span class="text-cyan-400 font-semibold">Instant</span>
-                        </div>
+                        <div class="flex justify-between"><span class="text-gray-400">ROI</span><span class="text-green-400 font-bold">+20%</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Duration</span><span class="text-white font-semibold">1 Hour</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Withdrawal</span><span class="text-cyan-400 font-semibold">Instant</span></div>
                     </div>
                     <div class="border-t border-purple-500/20 pt-6 space-y-4">
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Select Cryptocurrency</label>
-                            <select class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white">
+                            <select class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white plan-select">
                                 <option>Bitcoin (BTC)</option>
                                 <option>Ethereum (ETH)</option>
                                 <option>Tether (USDT)</option>
@@ -148,33 +138,24 @@
                         </div>
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Investment Amount (Min $200)</label>
-                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white">
+                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white plan-amount">
                         </div>
-                        <button class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Invest Now</button>
+                        <button class="w-full invest-btn bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Invest Now</button>
                     </div>
                 </div>
 
                 <!-- 5 Hours Plan -->
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl p-8">
+                <div class="plan-card bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl p-8">
                     <h3 class="text-2xl font-bold text-white mb-6">5 Hours Plan</h3>
                     <div class="space-y-4 mb-6">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">ROI</span>
-                            <span class="text-green-400 font-bold">+30%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Duration</span>
-                            <span class="text-white font-semibold">5 Hours</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Withdrawal</span>
-                            <span class="text-cyan-400 font-semibold">Instant</span>
-                        </div>
+                        <div class="flex justify-between"><span class="text-gray-400">ROI</span><span class="text-green-400 font-bold">+30%</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Duration</span><span class="text-white font-semibold">5 Hours</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Withdrawal</span><span class="text-cyan-400 font-semibold">Instant</span></div>
                     </div>
                     <div class="border-t border-purple-500/20 pt-6 space-y-4">
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Select Cryptocurrency</label>
-                            <select class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white">
+                            <select class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white plan-select">
                                 <option>Bitcoin (BTC)</option>
                                 <option>Ethereum (ETH)</option>
                                 <option>Tether (USDT)</option>
@@ -187,33 +168,24 @@
                         </div>
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Investment Amount (Min $200)</label>
-                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white">
+                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white plan-amount">
                         </div>
-                        <button class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Invest Now</button>
+                        <button class="w-full invest-btn bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Invest Now</button>
                     </div>
                 </div>
 
                 <!-- 24 Hours Plan -->
-                <div class="bg-gradient-to-br from-purple-900 to-pink-900 border-2 border-purple-400 rounded-xl p-8">
+                <div class="plan-card bg-gradient-to-br from-purple-900 to-pink-900 border-2 border-purple-400 rounded-xl p-8">
                     <h3 class="text-2xl font-bold text-white mb-6">24 Hours Plan</h3>
                     <div class="space-y-4 mb-6">
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">ROI</span>
-                            <span class="text-green-300 font-bold">+68%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Duration</span>
-                            <span class="text-white font-semibold">24 Hours</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Withdrawal</span>
-                            <span class="text-cyan-300 font-semibold">Instant</span>
-                        </div>
+                        <div class="flex justify-between"><span class="text-gray-300">ROI</span><span class="text-green-300 font-bold">+68%</span></div>
+                        <div class="flex justify-between"><span class="text-gray-300">Duration</span><span class="text-white font-semibold">24 Hours</span></div>
+                        <div class="flex justify-between"><span class="text-gray-300">Withdrawal</span><span class="text-cyan-300 font-semibold">Instant</span></div>
                     </div>
                     <div class="border-t border-white/20 pt-6 space-y-4">
                         <div>
                             <label class="block text-sm text-gray-300 mb-2">Select Cryptocurrency</label>
-                            <select class="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white">
+                            <select class="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white plan-select">
                                 <option>Bitcoin (BTC)</option>
                                 <option>Ethereum (ETH)</option>
                                 <option>Tether (USDT)</option>
@@ -226,33 +198,24 @@
                         </div>
                         <div>
                             <label class="block text-sm text-gray-300 mb-2">Investment Amount (Min $200)</label>
-                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white">
+                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-lg text-white plan-amount">
                         </div>
-                        <button class="w-full bg-white text-purple-900 font-bold py-3 rounded-lg hover:bg-gray-100 transition">Invest Now</button>
+                        <button class="w-full invest-btn bg-white text-purple-900 font-bold py-3 rounded-lg hover:bg-gray-100 transition">Invest Now</button>
                     </div>
                 </div>
 
                 <!-- 72 Hours Plan -->
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl p-8">
+                <div class="plan-card bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl p-8">
                     <h3 class="text-2xl font-bold text-white mb-6">72 Hours Plan</h3>
                     <div class="space-y-4 mb-6">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">ROI</span>
-                            <span class="text-green-400 font-bold">+89%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Duration</span>
-                            <span class="text-white font-semibold">72 Hours</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Withdrawal</span>
-                            <span class="text-cyan-400 font-semibold">Instant</span>
-                        </div>
+                        <div class="flex justify-between"><span class="text-gray-400">ROI</span><span class="text-green-400 font-bold">+89%</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Duration</span><span class="text-white font-semibold">72 Hours</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Withdrawal</span><span class="text-cyan-400 font-semibold">Instant</span></div>
                     </div>
                     <div class="border-t border-purple-500/20 pt-6 space-y-4">
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Select Cryptocurrency</label>
-                            <select class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white">
+                            <select class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white plan-select">
                                 <option>Bitcoin (BTC)</option>
                                 <option>Ethereum (ETH)</option>
                                 <option>Tether (USDT)</option>
@@ -265,33 +228,24 @@
                         </div>
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Investment Amount (Min $200)</label>
-                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white">
+                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white plan-amount">
                         </div>
-                        <button class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Invest Now</button>
+                        <button class="w-full invest-btn bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Invest Now</button>
                     </div>
                 </div>
 
                 <!-- 1 Week Plan -->
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl p-8">
+                <div class="plan-card bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/20 rounded-xl p-8">
                     <h3 class="text-2xl font-bold text-white mb-6">1 Week Plan</h3>
                     <div class="space-y-4 mb-6">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">ROI</span>
-                            <span class="text-green-400 font-bold">+190%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Duration</span>
-                            <span class="text-white font-semibold">1 Week</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Withdrawal</span>
-                            <span class="text-cyan-400 font-semibold">Instant</span>
-                        </div>
+                        <div class="flex justify-between"><span class="text-gray-400">ROI</span><span class="text-green-400 font-bold">+190%</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Duration</span><span class="text-white font-semibold">1 Week</span></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Withdrawal</span><span class="text-cyan-400 font-semibold">Instant</span></div>
                     </div>
                     <div class="border-t border-purple-500/20 pt-6 space-y-4">
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Select Cryptocurrency</label>
-                            <select class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white">
+                            <select class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white plan-select">
                                 <option>Bitcoin (BTC)</option>
                                 <option>Ethereum (ETH)</option>
                                 <option>Tether (USDT)</option>
@@ -304,9 +258,9 @@
                         </div>
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">Investment Amount (Min $200)</label>
-                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white">
+                            <input type="number" placeholder="Enter amount" class="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white plan-amount">
                         </div>
-                        <button class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Invest Now</button>
+                        <button class="w-full invest-btn bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Invest Now</button>
                     </div>
                 </div>
 
@@ -314,7 +268,7 @@
         </div>
     </section>
 
-    <!-- Crypto profit calculator -->
+    <!-- Calculator -->
     <section class="px-4 py-24 sm:px-6 lg:px-8 bg-slate-900/30">
         <div class="mx-auto max-w-3xl">
             <div class="bg-slate-900/80 border border-purple-500/20 rounded-2xl p-8 backdrop-blur">
@@ -345,13 +299,11 @@
         </div>
     </section>
 
-    <!-- Added investment confirmation modal -->
+    <!-- Modal -->
     <div id="investmentModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-purple-500/30 rounded-2xl p-8 max-w-md w-full">
             <h3 class="text-2xl font-bold text-white mb-6" id="modalTitle">Confirm Investment</h3>
-            <div id="modalContent" class="space-y-4 mb-6">
-                <!-- Content will be dynamically inserted -->
-            </div>
+            <div id="modalContent" class="space-y-4 mb-6"></div>
             <div class="flex gap-4">
                 <button onclick="closeModal()" class="flex-1 bg-slate-800 text-white font-bold py-3 rounded-lg hover:bg-slate-700 transition">Cancel</button>
                 <button id="confirmButton" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition">Confirm</button>
@@ -431,12 +383,11 @@
         const userEmail = localStorage.getItem('v0trade_user_email');
         return userEmail !== null && userEmail !== '';
     }
-
     function getUserEmail() {
         return localStorage.getItem('v0trade_user_email') || '';
     }
 
-    // --- Modal helpers (use your existing modal DOM) ---------------------
+    // --- Modal helpers ---------------------------------------------------
     function showModal(title, content, confirmCallback) {
         document.getElementById('modalTitle').textContent = title;
         document.getElementById('modalContent').innerHTML = content;
@@ -446,27 +397,25 @@
         confirmBtn.disabled = false;
         confirmBtn.onclick = confirmCallback;
     }
-
     function closeModal() {
         document.getElementById('investmentModal').classList.add('hidden');
         const confirmBtn = document.getElementById('confirmButton');
         confirmBtn.onclick = null;
+        confirmBtn.disabled = false;
     }
 
     // --- Calculation helpers ---------------------------------------------
     function getDaysFromDuration(duration) {
         if (!duration) return 1;
-        if (duration.toLowerCase().includes('hour')) {
+        if (String(duration).toLowerCase().includes('hour')) {
             const hours = parseInt(duration, 10) || 1;
             return Math.max(1, Math.ceil(hours / 24));
-        } else if (duration.toLowerCase().includes('week')) {
+        } else if (String(duration).toLowerCase().includes('week')) {
             return 7;
         }
         return 1;
     }
-
     function calculateReturns(amount, roiPercent, duration) {
-        // roiPercent = e.g. 20 -> 20%
         const roiMultiplier = 1 + (parseFloat(roiPercent) / 100);
         const totalReturn = amount * roiMultiplier;
         const profit = totalReturn - amount;
@@ -476,28 +425,25 @@
     }
 
     // --- Baserow interactions --------------------------------------------
-    // Fetch wallet rows (first page; increase page_size if you expect >100 rows)
     async function fetchWalletRows() {
         const url = `${BASEROW_API_URL}/${WALLET_TABLE_ID}/?user_field_names=false&page_size=100`;
         const res = await fetch(url, {
             headers: { 'Authorization': `Token ${BASEROW_TOKEN}` }
         });
         if (!res.ok) throw new Error('Failed fetching wallet rows');
-        return res.json(); // returns { results: [...] } for paginated responses
+        return res.json();
     }
 
-    // Find user's wallet row by email (returns { row, rowId, balance } or null)
     async function getWalletByEmail(email) {
         try {
             const json = await fetchWalletRows();
             const rows = json.results || [];
             const match = rows.find(r => {
                 const val = r[WALLET_EMAIL_FIELD];
-                return typeof val === 'string' && val.toLowerCase() === email.toLowerCase();
+                return typeof val === 'string' && val.toLowerCase() === String(email).toLowerCase();
             });
             if (!match) return null;
 
-            // read balance field - it might be string like "$1,000.00" or a number
             let rawBalance = match[WALLET_BALANCE_FIELD];
             let balance = 0;
             if (rawBalance === null || rawBalance === undefined) {
@@ -505,10 +451,8 @@
             } else if (typeof rawBalance === 'number') {
                 balance = rawBalance;
             } else if (typeof rawBalance === 'string') {
-                // strip $ and commas
                 balance = parseFloat(rawBalance.replace(/[^0-9.\-]/g, '')) || 0;
             } else {
-                // fallback: attempt numeric coercion
                 balance = parseFloat(String(rawBalance)) || 0;
             }
 
@@ -519,14 +463,11 @@
         }
     }
 
-    // Patch wallet balance by row id
     async function patchWalletBalance(rowId, newBalance) {
         try {
             const url = `${BASEROW_API_URL}/${WALLET_TABLE_ID}/${rowId}/?user_field_names=false`;
             const body = {};
-            // Send numeric value; if your Baserow field is text, you can change to `"$" + newBalance.toFixed(2)`
-            body[WALLET_BALANCE_FIELD] = Number(newBalance.toFixed ? newBalance.toFixed(2) : newBalance);
-
+            body[WALLET_BALANCE_FIELD] = Number(typeof newBalance === 'number' ? newBalance.toFixed(2) : newBalance);
             const res = await fetch(url, {
                 method: 'PATCH',
                 headers: {
@@ -542,19 +483,17 @@
         }
     }
 
-    // Create investment record in investment table using field IDs
-    async function postInvestmentRecord({ email, amount, dailyReturn, totalReturn, status, durationDays, type, planName }) {
+    async function postInvestmentRecord({ email, amount, dailyReturn, totalReturn, status, durationDays, type }) {
         try {
             const url = `${BASEROW_API_URL}/${INVESTMENT_TABLE_ID}/?user_field_names=false`;
             const payload = {};
             payload[INV_EMAIL_FIELD] = email;
-            payload[INV_AMOUNT_FIELD] = Number(amount.toFixed ? amount.toFixed(2) : amount);
-            payload[INV_DAILY_FIELD] = Number(dailyReturn.toFixed ? dailyReturn.toFixed(2) : dailyReturn);
-            payload[INV_TOTAL_FIELD] = Number(totalReturn.toFixed ? totalReturn.toFixed(2) : totalReturn);
+            payload[INV_AMOUNT_FIELD] = Number((typeof amount === 'number') ? amount.toFixed(2) : parseFloat(amount || 0).toFixed(2));
+            payload[INV_DAILY_FIELD] = Number((typeof dailyReturn === 'number') ? dailyReturn.toFixed(2) : parseFloat(dailyReturn || 0).toFixed(2));
+            payload[INV_TOTAL_FIELD] = Number((typeof totalReturn === 'number') ? totalReturn.toFixed(2) : parseFloat(totalReturn || 0).toFixed(2));
             payload[INV_STATUS_FIELD] = status || 'Active';
             payload[INV_DURATION_FIELD] = String(durationDays);
             payload[INV_TYPE_FIELD] = type || '';
-            // Optionally include a plan name field if you have one; not in mapping so skipping.
 
             const res = await fetch(url, {
                 method: 'POST',
@@ -571,16 +510,36 @@
         }
     }
 
+    // --- Helper: find select + input relative to button -------------------
+    function findSelectAndInputFromButton(btn) {
+        // search up until a container that contains both a select and input[type=number]
+        let el = btn;
+        for (let i = 0; i < 6 && el; i++) {
+            const select = el.querySelector ? el.querySelector('select') : null;
+            const input = el.querySelector ? el.querySelector('input[type="number"]') : null;
+            if (select && input) return { select, input };
+            el = el.parentElement;
+        }
+        // last-resort: search closest .plan-card ancestor
+        const card = btn.closest('.plan-card');
+        if (card) {
+            return {
+                select: card.querySelector('select'),
+                input: card.querySelector('input[type="number"]')
+            };
+        }
+        // fallback to document query (not ideal)
+        return {
+            select: document.querySelector('select.plan-select') || document.querySelector('select'),
+            input: document.querySelector('input.plan-amount') || document.querySelector('input[type="number"]')
+        };
+    }
+
     // --- Investment flow -------------------------------------------------
     async function handleInvest(planName, roiPercent, duration, event) {
         try {
-            // event passed from listener
             const btn = event.currentTarget || event.target;
-            const card = btn.closest('.bg-gradient-to-br, .bg-gradient-to-br, .bg-gradient-to-br, .bg-\\[gradient\\]');
-            // fallback: find nearest ancestor with select and input
-            const select = card ? card.querySelector('select') : btn.closest('div').querySelector('select');
-            const input = card ? card.querySelector('input[type="number"]') : btn.closest('div').querySelector('input[type="number"]');
-
+            const { select, input } = findSelectAndInputFromButton(btn);
             const cryptocurrency = select ? select.value : '';
             const amount = input ? parseFloat(input.value) : NaN;
 
@@ -598,7 +557,6 @@
             const { totalReturn, profit, dailyReturn } = calculateReturns(amount, roiPercent, duration);
             const durationDays = getDaysFromDuration(duration);
 
-            // Show confirmation modal with details and Confirm button handler
             const modalContent = `
                 <div class="space-y-3">
                     <div class="flex justify-between text-gray-300"><span>Plan:</span><span class="text-white font-semibold">${planName}</span></div>
@@ -612,7 +570,6 @@
             `;
 
             showModal('Confirm Investment', modalContent, async () => {
-                // Disable button and show processing state
                 const confirmBtn = document.getElementById('confirmButton');
                 confirmBtn.disabled = true;
                 document.getElementById('modalContent').innerHTML = '<p class="text-center text-gray-300">Processing...</p>';
@@ -625,8 +582,7 @@
                 }
 
                 if (wallet.balance < amount) {
-                    showModal(
-                        'Insufficient Balance',
+                    showModal('Insufficient Balance',
                         `<p class="text-gray-300">Insufficient wallet balance to complete this investment.</p>
                          <p class="text-gray-400 text-sm mt-2">Your balance: $${wallet.balance.toFixed(2)}</p>
                          <p class="text-gray-400 text-sm">Required: $${amount.toFixed(2)}</p>`,
@@ -651,20 +607,18 @@
                     totalReturn,
                     status: 'Active',
                     durationDays,
-                    type: cryptocurrency,
-                    planName
+                    type: cryptocurrency
                 });
 
                 if (investCreated) {
-                    showModal(
-                        'Success!',
+                    showModal('Success!',
                         `<p class="text-green-400 font-semibold text-center">Investment successful!</p>
                          <p class="text-gray-300 text-center mt-4">Your ${planName} investment is now active.</p>
                          <p class="text-gray-400 text-sm text-center mt-2">New wallet balance: $${newBalance.toFixed(2)}</p>`,
                         () => { window.location.href = 'dashboard.html'; }
                     );
                 } else {
-                    // Rollback wallet balance (best effort)
+                    // rollback balance (best-effort)
                     await patchWalletBalance(wallet.rowId, wallet.balance);
                     showModal('Error', '<p class="text-gray-300">Failed to create investment. Your balance has been restored. Please try again.</p>', closeModal);
                 }
@@ -678,7 +632,7 @@
 
     // --- Attach listeners to Invest Now buttons --------------------------
     document.addEventListener('DOMContentLoaded', function() {
-        const investButtons = Array.from(document.querySelectorAll('button')).filter(b => b.textContent && b.textContent.trim().toLowerCase().includes('invest now') && !b.id);
+        const investButtons = Array.from(document.querySelectorAll('.invest-btn'));
         const plans = [
             { name: '1 Hour Plan', roi: '20', duration: '1 Hour' },
             { name: '5 Hours Plan', roi: '30', duration: '5 Hours' },
@@ -688,12 +642,12 @@
         ];
 
         investButtons.forEach((button, idx) => {
-            if (!plans[idx]) return;
-            button.addEventListener('click', (e) => handleInvest(plans[idx].name, plans[idx].roi, plans[idx].duration, e));
+            const plan = plans[idx] || plans[plans.length - 1];
+            button.addEventListener('click', (e) => handleInvest(plan.name, plan.roi, plan.duration, e));
         });
     });
 
-    // --- Calculator (kept as-is with minor safety) -----------------------
+    // --- Calculator -----------------------------------------------------
     function calculateCrypto() {
         const multiplier = parseFloat(document.getElementById('cryptoPlan').value);
         const amount = parseFloat(document.getElementById('cryptoAmount').value);
