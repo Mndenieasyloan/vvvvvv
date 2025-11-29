@@ -407,18 +407,17 @@
         </div>
     </footer>
 
- <script>
-    /*************************************************************************
-     * CONFIG
-     *************************************************************************/
+<script>
+    // --- Utility & config ------------------------------------------------
     const BASEROW_TOKEN = 'LG6hnTBxgBG78FueElsSwpHRd4Wep1oL';
-    const WALLET_TABLE_ID = '756077';     // wallets table (rows)
-    const INVESTMENT_TABLE_ID = '756316'; // investment table (rows)
-    const BASEROW_API_ROWS = 'https://api.baserow.io/api/database/rows/table';
-    // Field IDs in wallet table (as you requested)
+    const WALLET_TABLE_ID = '756077';
+    const INVESTMENT_TABLE_ID = '756316';
+    const BASEROW_API_URL = 'https://api.baserow.io/api/database/rows/table';
+
+    // Field IDs (as requested)
     const WALLET_EMAIL_FIELD = 'field_6394418';
-    const WALLET_DEPOSIT_FIELD = 'field_6394419';
-    // Investment table field IDs
+    const WALLET_BALANCE_FIELD = 'field_6394419';
+
     const INV_AMOUNT_FIELD = 'field_6397378';
     const INV_DAILY_FIELD = 'field_6397379';
     const INV_TOTAL_FIELD = 'field_6397380';
@@ -427,109 +426,108 @@
     const INV_EMAIL_FIELD = 'field_6397383';
     const INV_TYPE_FIELD = 'field_6406096';
 
-    /*************************************************************************
-     * Basic helpers
-     *************************************************************************/
+    // --- Login helpers ---------------------------------------------------
     function checkLogin() {
         const userEmail = localStorage.getItem('v0trade_user_email');
-        return !!userEmail;
+        return userEmail !== null && userEmail !== '';
     }
+
     function getUserEmail() {
         return localStorage.getItem('v0trade_user_email') || '';
     }
-    function showModal(title, htmlContent, onConfirm = null, confirmText = 'Confirm') {
+
+    // --- Modal helpers (use your existing modal DOM) ---------------------
+    function showModal(title, content, confirmCallback) {
         document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalContent').innerHTML = htmlContent;
+        document.getElementById('modalContent').innerHTML = content;
         document.getElementById('investmentModal').classList.remove('hidden');
+
         const confirmBtn = document.getElementById('confirmButton');
         confirmBtn.disabled = false;
-        confirmBtn.textContent = confirmText;
-        // remove previous handlers
-        confirmBtn.onclick = null;
-        if (onConfirm) {
-            confirmBtn.onclick = onConfirm;
-            confirmBtn.style.display = '';
-        } else {
-            confirmBtn.style.display = 'none';
-        }
+        confirmBtn.onclick = confirmCallback;
     }
+
     function closeModal() {
         document.getElementById('investmentModal').classList.add('hidden');
-        document.getElementById('modalContent').innerHTML = '';
+        const confirmBtn = document.getElementById('confirmButton');
+        confirmBtn.onclick = null;
     }
 
-    document.getElementById('cancelButton').addEventListener('click', closeModal);
-
-    // Convert duration like "1 Hour", "5 Hours", "24 Hours", "72 Hours", "1 Week" into days
+    // --- Calculation helpers ---------------------------------------------
     function getDaysFromDuration(duration) {
         if (!duration) return 1;
         if (duration.toLowerCase().includes('hour')) {
-            const hours = parseInt(duration);
-            if (isNaN(hours)) return 1;
+            const hours = parseInt(duration, 10) || 1;
             return Math.max(1, Math.ceil(hours / 24));
+        } else if (duration.toLowerCase().includes('week')) {
+            return 7;
         }
-        if (duration.toLowerCase().includes('week')) return 7;
         return 1;
     }
 
     function calculateReturns(amount, roiPercent, duration) {
-        const roiMultiplier = (parseFloat(roiPercent) / 100) + 1;
-        const total = amount * roiMultiplier;
-        const profit = total - amount;
+        // roiPercent = e.g. 20 -> 20%
+        const roiMultiplier = 1 + (parseFloat(roiPercent) / 100);
+        const totalReturn = amount * roiMultiplier;
+        const profit = totalReturn - amount;
         const days = getDaysFromDuration(duration);
-        const daily = profit / Math.max(1, days);
-        return { totalReturn: total, profit, dailyReturn: daily };
+        const dailyReturn = profit / days;
+        return { totalReturn, profit, dailyReturn };
     }
 
-    /*************************************************************************
-     * Baserow: Wallet functions
-     * We'll fetch the rows of WALLET_TABLE_ID with field ids (not user_field_names)
-     * and search where values[WALLET_EMAIL_FIELD] === email
-     *************************************************************************/
-    async function getWalletRowByEmail(email) {
+    // --- Baserow interactions --------------------------------------------
+    // Fetch wallet rows (first page; increase page_size if you expect >100 rows)
+    async function fetchWalletRows() {
+        const url = `${BASEROW_API_URL}/${WALLET_TABLE_ID}/?user_field_names=false&page_size=100`;
+        const res = await fetch(url, {
+            headers: { 'Authorization': `Token ${BASEROW_TOKEN}` }
+        });
+        if (!res.ok) throw new Error('Failed fetching wallet rows');
+        return res.json(); // returns { results: [...] } for paginated responses
+    }
+
+    // Find user's wallet row by email (returns { row, rowId, balance } or null)
+    async function getWalletByEmail(email) {
         try {
-            // fetch rows (first page). If you have many rows, implement pagination similarly.
-            const res = await fetch(`${BASEROW_API_ROWS}/${WALLET_TABLE_ID}/?user_field_names=false`, {
-                headers: { 'Authorization': `Token ${BASEROW_TOKEN}` }
+            const json = await fetchWalletRows();
+            const rows = json.results || [];
+            const match = rows.find(r => {
+                const val = r[WALLET_EMAIL_FIELD];
+                return typeof val === 'string' && val.toLowerCase() === email.toLowerCase();
             });
-            if (!res.ok) {
-                console.error('Failed to fetch wallet rows', res.status, await res.text());
-                return null;
-            }
-            const data = await res.json();
-            // data.results may be present or data may be an array; try both
-            const rows = Array.isArray(data) ? data : (data.results || []);
-            const found = rows.find(r => {
-                const v = r.values && r.values[WALLET_EMAIL_FIELD];
-                return (typeof v === 'string' && v.toLowerCase() === email.toLowerCase());
-            });
-            if (!found) return null;
-            // read deposit balance safely
-            const rawBalance = found.values ? found.values[WALLET_DEPOSIT_FIELD] : null;
+            if (!match) return null;
+
+            // read balance field - it might be string like "$1,000.00" or a number
+            let rawBalance = match[WALLET_BALANCE_FIELD];
             let balance = 0;
             if (rawBalance === null || rawBalance === undefined) {
                 balance = 0;
             } else if (typeof rawBalance === 'number') {
                 balance = rawBalance;
             } else if (typeof rawBalance === 'string') {
-                // remove currency symbols and commas
-                balance = parseFloat(rawBalance.replace(/[^0-9.\-]+/g, '')) || 0;
+                // strip $ and commas
+                balance = parseFloat(rawBalance.replace(/[^0-9.\-]/g, '')) || 0;
             } else {
-                balance = Number(rawBalance) || 0;
+                // fallback: attempt numeric coercion
+                balance = parseFloat(String(rawBalance)) || 0;
             }
-            return { rowId: found.id, balance };
+
+            return { row: match, rowId: match.id, balance };
         } catch (err) {
-            console.error('getWalletRowByEmail error', err);
+            console.error('getWalletByEmail error', err);
             return null;
         }
     }
 
-    async function updateWalletBalance(rowId, newBalance) {
+    // Patch wallet balance by row id
+    async function patchWalletBalance(rowId, newBalance) {
         try {
+            const url = `${BASEROW_API_URL}/${WALLET_TABLE_ID}/${rowId}/?user_field_names=false`;
             const body = {};
-            // send numeric value; Baserow accepts number or string depending on field type
-            body[WALLET_DEPOSIT_FIELD] = newBalance;
-            const res = await fetch(`${BASEROW_API_ROWS}/${WALLET_TABLE_ID}/${rowId}/?user_field_names=false`, {
+            // Send numeric value; if your Baserow field is text, you can change to `"$" + newBalance.toFixed(2)`
+            body[WALLET_BALANCE_FIELD] = Number(newBalance.toFixed ? newBalance.toFixed(2) : newBalance);
+
+            const res = await fetch(url, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Token ${BASEROW_TOKEN}`,
@@ -537,180 +535,150 @@
                 },
                 body: JSON.stringify(body)
             });
-            if (!res.ok) {
-                console.error('Failed to PATCH wallet balance', res.status, await res.text());
-                return false;
-            }
-            return true;
+            return res.ok;
         } catch (err) {
-            console.error('updateWalletBalance error', err);
+            console.error('patchWalletBalance error', err);
             return false;
         }
     }
 
-    /*************************************************************************
-     * Baserow: Create investment row
-     *************************************************************************/
-    async function createInvestmentRecord({ email, amount, dailyReturn, totalReturn, duration, planType, investmentType }) {
+    // Create investment record in investment table using field IDs
+    async function postInvestmentRecord({ email, amount, dailyReturn, totalReturn, status, durationDays, type, planName }) {
         try {
-            const body = {};
-            body[INV_AMOUNT_FIELD] = amount;
-            body[INV_DAILY_FIELD] = dailyReturn;
-            body[INV_TOTAL_FIELD] = totalReturn;
-            body[INV_STATUS_FIELD] = 'Active';
-            body[INV_DURATION_FIELD] = duration;
-            body[INV_EMAIL_FIELD] = email;
-            body[INV_TYPE_FIELD] = investmentType || '';
-            const res = await fetch(`${BASEROW_API_ROWS}/${INVESTMENT_TABLE_ID}/?user_field_names=false`, {
+            const url = `${BASEROW_API_URL}/${INVESTMENT_TABLE_ID}/?user_field_names=false`;
+            const payload = {};
+            payload[INV_EMAIL_FIELD] = email;
+            payload[INV_AMOUNT_FIELD] = Number(amount.toFixed ? amount.toFixed(2) : amount);
+            payload[INV_DAILY_FIELD] = Number(dailyReturn.toFixed ? dailyReturn.toFixed(2) : dailyReturn);
+            payload[INV_TOTAL_FIELD] = Number(totalReturn.toFixed ? totalReturn.toFixed(2) : totalReturn);
+            payload[INV_STATUS_FIELD] = status || 'Active';
+            payload[INV_DURATION_FIELD] = String(durationDays);
+            payload[INV_TYPE_FIELD] = type || '';
+            // Optionally include a plan name field if you have one; not in mapping so skipping.
+
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Token ${BASEROW_TOKEN}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(payload)
             });
-            if (!res.ok) {
-                console.error('Failed to create investment row', res.status, await res.text());
-                return { ok: false, status: res.status, text: await res.text() };
-            }
-            const json = await res.json();
-            return { ok: true, row: json };
+            return res.ok;
         } catch (err) {
-            console.error('createInvestmentRecord error', err);
-            return { ok: false, error: err.message || err };
+            console.error('postInvestmentRecord error', err);
+            return false;
         }
     }
 
-    /*************************************************************************
-     * Investment flow
-     *************************************************************************/
-    async function processInvestmentFlow({ email, amount, planName, roiPercent, duration, investmentType, onSuccess, onFailure }) {
-        // UI: show processing
-        document.getElementById('modalContent').innerHTML = '<p class="text-center text-gray-300">Processing investment...</p>';
-        document.getElementById('confirmButton').disabled = true;
+    // --- Investment flow -------------------------------------------------
+    async function handleInvest(planName, roiPercent, duration, event) {
+        try {
+            // event passed from listener
+            const btn = event.currentTarget || event.target;
+            const card = btn.closest('.bg-gradient-to-br, .bg-gradient-to-br, .bg-gradient-to-br, .bg-\\[gradient\\]');
+            // fallback: find nearest ancestor with select and input
+            const select = card ? card.querySelector('select') : btn.closest('div').querySelector('select');
+            const input = card ? card.querySelector('input[type="number"]') : btn.closest('div').querySelector('input[type="number"]');
 
-        // 1) get wallet row
-        const wallet = await getWalletRowByEmail(email);
-        if (!wallet) {
-            showModal('Wallet Not Found', `<p class="text-gray-300">Could not find a wallet for ${email}. Please fund your account or contact support.</p>`);
-            return onFailure && onFailure('wallet_not_found');
-        }
+            const cryptocurrency = select ? select.value : '';
+            const amount = input ? parseFloat(input.value) : NaN;
 
-        // 2) check balance
-        if (wallet.balance < amount) {
-            showModal(
-                'Insufficient Balance',
-                `<p class="text-gray-300">You have insufficient funds to make this investment.</p>
-                 <p class="text-gray-400 text-sm mt-2">Your balance: $${wallet.balance.toFixed(2)}</p>
-                 <p class="text-gray-400 text-sm">Required: $${amount.toFixed(2)}</p>`
-            );
-            return onFailure && onFailure('insufficient_balance');
-        }
+            if (isNaN(amount) || amount < 200) {
+                showModal('Invalid Amount', '<p class="text-gray-300">Please enter an amount of at least $200.</p>', closeModal);
+                return;
+            }
 
-        // 3) deduct amount
-        const newBalance = +(wallet.balance - amount).toFixed(8); // keep precision
-        const updated = await updateWalletBalance(wallet.rowId, newBalance);
-        if (!updated) {
-            showModal('Error', '<p class="text-gray-300">Failed to debit wallet. Please try again later.</p>');
-            return onFailure && onFailure('update_failed');
-        }
+            if (!checkLogin()) {
+                showModal('Login Required', '<p class="text-gray-300">You must log in before investing.</p>', () => { window.location.href = 'login.html'; });
+                return;
+            }
 
-        // 4) create investment row
-        const returns = calculateReturns(amount, roiPercent, duration);
-        const createRes = await createInvestmentRecord({
-            email,
-            amount,
-            dailyReturn: +returns.dailyReturn.toFixed(8),
-            totalReturn: +returns.totalReturn.toFixed(8),
-            duration,
-            planType: planName,
-            investmentType
-        });
+            const email = getUserEmail();
+            const { totalReturn, profit, dailyReturn } = calculateReturns(amount, roiPercent, duration);
+            const durationDays = getDaysFromDuration(duration);
 
-        if (!createRes.ok) {
-            // Rollback wallet balance
-            await updateWalletBalance(wallet.rowId, wallet.balance).catch(err => console.error('rollback failed', err));
-            showModal('Error', '<p class="text-gray-300">Failed to create investment record. Your wallet balance has been restored. Please try again.</p>');
-            return onFailure && onFailure('create_failed');
-        }
+            // Show confirmation modal with details and Confirm button handler
+            const modalContent = `
+                <div class="space-y-3">
+                    <div class="flex justify-between text-gray-300"><span>Plan:</span><span class="text-white font-semibold">${planName}</span></div>
+                    <div class="flex justify-between text-gray-300"><span>Cryptocurrency:</span><span class="text-white font-semibold">${cryptocurrency}</span></div>
+                    <div class="flex justify-between text-gray-300"><span>Investment:</span><span class="text-white font-semibold">$${amount.toFixed(2)}</span></div>
+                    <div class="flex justify-between text-gray-300"><span>ROI:</span><span class="text-green-400 font-semibold">+${roiPercent}%</span></div>
+                    <div class="flex justify-between text-gray-300"><span>Duration:</span><span class="text-white font-semibold">${duration}</span></div>
+                    <div class="flex justify-between text-gray-300"><span>Daily Return:</span><span class="text-cyan-400 font-semibold">$${dailyReturn.toFixed(2)}</span></div>
+                    <div class="flex justify-between text-gray-300"><span>Total Expected:</span><span class="text-purple-400 font-bold text-xl">$${totalReturn.toFixed(2)}</span></div>
+                </div>
+            `;
 
-        // Success
-        showModal(
-            'Success!',
-            `<p class="text-green-400 font-semibold text-center">Investment successful!</p>
-             <p class="text-gray-300 text-center mt-4">${planName} investment is now active.</p>
-             <p class="text-gray-400 text-sm text-center mt-2">You invested: $${amount.toFixed(2)} — Expected total: $${returns.totalReturn.toFixed(2)}</p>`,
-            () => {
-                closeModal();
-                // go to dashboard
-                window.location.href = 'dashboard.html';
-            },
-            'Go to Dashboard'
-        );
-        if (onSuccess) onSuccess(createRes.row);
-    }
+            showModal('Confirm Investment', modalContent, async () => {
+                // Disable button and show processing state
+                const confirmBtn = document.getElementById('confirmButton');
+                confirmBtn.disabled = true;
+                document.getElementById('modalContent').innerHTML = '<p class="text-center text-gray-300">Processing...</p>';
 
-    /*************************************************************************
-     * UI wiring for invest buttons
-     *************************************************************************/
-    function handleInvestButtonClick(planName, roiPercent, duration, e) {
-        e.preventDefault();
-        // find nearest card that contains select and input
-        let container = e.target.closest('div');
-        // climb up until we find a parent containing a select and input[type=number]
-        while (container && !(container.querySelector && container.querySelector('select') && container.querySelector('input[type="number"]'))) {
-            container = container.parentElement;
-        }
-        if (!container) {
-            alert('Unable to locate investment input fields.');
-            return;
-        }
-        const selectEl = container.querySelector('select');
-        const inputEl = container.querySelector('input[type="number"]');
-        const investmentType = selectEl ? selectEl.value : '';
-        const amount = inputEl ? parseFloat(inputEl.value) : NaN;
+                // Get wallet
+                const wallet = await getWalletByEmail(email);
+                if (!wallet) {
+                    showModal('Wallet Not Found', '<p class="text-gray-300">Unable to find your wallet. Please deposit funds or contact support.</p>', closeModal);
+                    return;
+                }
 
-        if (isNaN(amount) || amount < 200) {
-            showModal('Invalid Amount', '<p class="text-gray-300">Please enter a valid amount (minimum $200).</p>');
-            return;
-        }
+                if (wallet.balance < amount) {
+                    showModal(
+                        'Insufficient Balance',
+                        `<p class="text-gray-300">Insufficient wallet balance to complete this investment.</p>
+                         <p class="text-gray-400 text-sm mt-2">Your balance: $${wallet.balance.toFixed(2)}</p>
+                         <p class="text-gray-400 text-sm">Required: $${amount.toFixed(2)}</p>`,
+                        closeModal
+                    );
+                    return;
+                }
 
-        if (!checkLogin()) {
-            showModal('Login Required', `<p class="text-gray-300">You must log in before investing.</p>`, () => { window.location.href = 'login.html'; }, 'Login');
-            return;
-        }
+                // Deduct funds
+                const newBalance = Number((wallet.balance - amount).toFixed(2));
+                const patched = await patchWalletBalance(wallet.rowId, newBalance);
+                if (!patched) {
+                    showModal('Error', '<p class="text-gray-300">Failed to update wallet balance. Please try again later.</p>', closeModal);
+                    return;
+                }
 
-        const email = getUserEmail();
-        const returns = calculateReturns(amount, roiPercent, duration);
+                // Create investment record
+                const investCreated = await postInvestmentRecord({
+                    email,
+                    amount,
+                    dailyReturn,
+                    totalReturn,
+                    status: 'Active',
+                    durationDays,
+                    type: cryptocurrency,
+                    planName
+                });
 
-        // Show confirmation modal with details and attach confirm handler
-        const content = `
-            <div class="space-y-3">
-                <div class="flex justify-between text-gray-300"><span>Plan:</span><span class="text-white font-semibold">${planName}</span></div>
-                <div class="flex justify-between text-gray-300"><span>Cryptocurrency:</span><span class="text-white font-semibold">${investmentType}</span></div>
-                <div class="flex justify-between text-gray-300"><span>Investment:</span><span class="text-white font-semibold">$${amount.toFixed(2)}</span></div>
-                <div class="flex justify-between text-gray-300"><span>ROI:</span><span class="text-green-400 font-semibold">+${roiPercent}%</span></div>
-                <div class="flex justify-between text-gray-300"><span>Duration:</span><span class="text-white font-semibold">${duration}</span></div>
-                <div class="flex justify-between text-gray-300"><span>Daily Return:</span><span class="text-cyan-400 font-semibold">$${returns.dailyReturn.toFixed(8)}</span></div>
-                <div class="flex justify-between text-gray-300"><span>Total Expected:</span><span class="text-purple-400 font-bold text-xl">$${returns.totalReturn.toFixed(8)}</span></div>
-            </div>
-        `;
-        showModal('Confirm Investment', content, async () => {
-            await processInvestmentFlow({
-                email,
-                amount,
-                planName,
-                roiPercent,
-                duration,
-                investmentType,
-                onSuccess: (row) => { /* optional callback */ },
-                onFailure: (err) => { console.error('investment failed', err); }
+                if (investCreated) {
+                    showModal(
+                        'Success!',
+                        `<p class="text-green-400 font-semibold text-center">Investment successful!</p>
+                         <p class="text-gray-300 text-center mt-4">Your ${planName} investment is now active.</p>
+                         <p class="text-gray-400 text-sm text-center mt-2">New wallet balance: $${newBalance.toFixed(2)}</p>`,
+                        () => { window.location.href = 'dashboard.html'; }
+                    );
+                } else {
+                    // Rollback wallet balance (best effort)
+                    await patchWalletBalance(wallet.rowId, wallet.balance);
+                    showModal('Error', '<p class="text-gray-300">Failed to create investment. Your balance has been restored. Please try again.</p>', closeModal);
+                }
             });
-        }, 'Confirm & Invest');
+
+        } catch (err) {
+            console.error('handleInvest error', err);
+            showModal('Error', '<p class="text-gray-300">Unexpected error occurred. Please try again later.</p>', closeModal);
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Plan definitions (must match order of your cards)
+    // --- Attach listeners to Invest Now buttons --------------------------
+    document.addEventListener('DOMContentLoaded', function() {
+        const investButtons = Array.from(document.querySelectorAll('button')).filter(b => b.textContent && b.textContent.trim().toLowerCase().includes('invest now') && !b.id);
         const plans = [
             { name: '1 Hour Plan', roi: '20', duration: '1 Hour' },
             { name: '5 Hours Plan', roi: '30', duration: '5 Hours' },
@@ -719,33 +687,27 @@
             { name: '1 Week Plan', roi: '190', duration: '1 Week' }
         ];
 
-        // Find all invest buttons (filter by text content to avoid binding other buttons)
-        const allButtons = Array.from(document.querySelectorAll('button'));
-        const investButtons = allButtons.filter(b => b.innerText && b.innerText.trim().toLowerCase().includes('invest now'));
-
-        investButtons.forEach((btn, idx) => {
-            const plan = plans[idx] || plans[0];
-            btn.addEventListener('click', (e) => handleInvestButtonClick(plan.name, plan.roi, plan.duration, e));
+        investButtons.forEach((button, idx) => {
+            if (!plans[idx]) return;
+            button.addEventListener('click', (e) => handleInvest(plans[idx].name, plans[idx].roi, plans[idx].duration, e));
         });
-
-        // wire crypto calculator button if present
-        const calcBtn = document.querySelector('button[onclick="calculateCrypto()"]');
-        if (calcBtn) {
-            calcBtn.addEventListener('click', () => {
-                const multiplier = parseFloat(document.getElementById('cryptoPlan').value);
-                const amount = parseFloat(document.getElementById('cryptoAmount').value);
-                if (amount && amount >= 200) {
-                    const total = amount * multiplier;
-                    const profit = total - amount;
-                    document.getElementById('cryptoProfit').textContent = '$' + profit.toFixed(2);
-                    document.getElementById('cryptoTotal').textContent = '$' + total.toFixed(2);
-                    document.getElementById('cryptoResult').classList.remove('hidden');
-                } else {
-                    alert('Please enter a valid amount (minimum $200)');
-                }
-            });
-        }
     });
-    </script>
+
+    // --- Calculator (kept as-is with minor safety) -----------------------
+    function calculateCrypto() {
+        const multiplier = parseFloat(document.getElementById('cryptoPlan').value);
+        const amount = parseFloat(document.getElementById('cryptoAmount').value);
+        if (amount && amount >= 200) {
+            const total = amount * multiplier;
+            const profit = total - amount;
+            document.getElementById('cryptoProfit').textContent = '$' + profit.toFixed(2);
+            document.getElementById('cryptoTotal').textContent = '$' + total.toFixed(2);
+            document.getElementById('cryptoResult').classList.remove('hidden');
+        } else {
+            alert('Please enter a valid amount (minimum $200)');
+        }
+    }
+</script>
+
 </body>
 </html>
