@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wallet Dashboard - V0 Trade</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -38,7 +38,6 @@
             border-radius: 1rem;
             padding: 1.5rem;
         }
-        
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
@@ -68,13 +67,11 @@
                 display: flex;
             }
         }
-        
         @media (min-width: 769px) {
             .sidebar-toggle {
                 display: none;
             }
         }
-        
         .mobile-menu { display: none; }
         .mobile-menu.active { display: block; }
         .dropdown { position: relative; display: inline-block; }
@@ -266,7 +263,7 @@
                             </div>
                             <div class="text-4xl">📁</div>
                         </div>
-                        <p id="allEarningWallet" class="text-3xl font-bold text-gray-900 mb-4">$0.0000</p>
+                        <p id="depositBalance" class="text-3xl font-bold text-gray-900 mb-4">$0.0000</p>
                         <div class="flex items-center justify-between gap-2">
                             <a href="deposit-wallet.html" class="text-sm text-orange-500 hover:text-orange-600 font-medium">View Transactions</a>
                             <a href="deposit.html" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
@@ -345,172 +342,185 @@
         </main>
     </div>
 
-<script>
-/* ==========================
-   BASEROW CONFIG
-========================== */
-const BASEROW_TOKEN = "LG6hnTBxgBG78FueElsSwpHRd4Wep1oL";
+    <script>
+        // ---------- CONFIG ----------
+        const WALLET_TABLE_ID = 756077;
+        const USER_TABLE_ID = 755975;
 
-const USER_TABLE_ID = 755975;
-const WALLET_TABLE_ID = 756077;
+        // user_field_names=true returns both field names & field_xxx keys; we'll reference by field_xxx for accuracy
+        const WALLET_API_URL = `https://api.baserow.io/api/database/rows/table/${WALLET_TABLE_ID}/?user_field_names=true`;
+        const USER_API_URL = `https://api.baserow.io/api/database/rows/table/${USER_TABLE_ID}/?user_field_names=true`;
 
-const USER_API_URL   = `https://api.baserow.io/api/database/rows/table/${USER_TABLE_ID}/?user_field_names=true`;
-const WALLET_API_URL = `https://api.baserow.io/api/database/rows/table/${WALLET_TABLE_ID}/?user_field_names=true`;
+        // NOTE: You previously included the token in the page. Keep this secure in production.
+        const BASEROW_TOKEN = "LG6hnTBxgBG78FueElsSwpHRd4Wep1oL";
 
-/* ==========================
-   FIELD IDS (CONFIRMED)
-========================== */
-// USER table
-const USER_NAME_FIELD = "field_6393282"; // Name field
+        // Field IDs (exact mapping you requested)
+        const FIELD_EMAIL_IN_WALLETS = "field_6394418";   // Wallets table: email field to match logged-in user
+        const FIELD_DEPOSIT_BALANCE   = "field_6394419";   // All Earning Wallet — deposit_balance
+        const FIELD_MINER_EARNING     = "field_6394420";   // Miner Earning — total_returned
+        const FIELD_TOTAL_COMM        = "field_6394421";   // Total Ref. Commissions — total_commissions
+        const FIELD_TOTAL_WALLET      = "field_6394422";   // Total Wallet Balance — total_earnings
+        const FIELD_INVEST_EARN       = "field_6394423";   // Investment Earning — earning_balance
 
-// WALLET table
-const FIELD_EMAIL            = "field_6394418"; // email
-const FIELD_DEPOSIT_BALANCE  = "field_6394419"; // deposit_balance
-const FIELD_MINER_EARNING    = "field_6394420"; // total_returned
-const FIELD_TOTAL_COMM       = "field_6394421"; // total_commissions
-const FIELD_TOTAL_WALLET     = "field_6394422"; // total_earnings
-const FIELD_INVEST_EARN      = "field_6394423"; // earning_balance
+        const USER_NAME_FIELD = "field_6393282"; // Users table name field
 
-/* ==========================
-   FORMAT CURRENCY
-========================== */
-function formatMoney(v) {
-    const n = Number(v);
-    if (!isFinite(n)) return "$0.0000";
-    return "$" + n.toFixed(4);
-}
-
-/* ==========================
-   PAGE LOAD
-========================== */
-window.addEventListener("DOMContentLoaded", async () => {
-
-    // Correct localStorage key (your login.html uses this!)
-    const userEmail = localStorage.getItem("userEmail");
-
-    if (!userEmail) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    // Show email
-    document.getElementById("userEmailDisplay").textContent = userEmail;
-    document.getElementById("headerEmailDisplay").textContent = userEmail;
-
-    // Load data
-    await Promise.all([
-        loadUserName(userEmail),
-        loadWallet(userEmail)
-    ]);
-});
-
-/* ==========================
-   LOAD USER NAME
-========================== */
-async function loadUserName(email) {
-    try {
-        // Filter by EMAIL field in the Users table
-        const filter = {
-            filter_type: "AND",
-            filters: [
-                { type: "equal", field: "Email", value: email }
-            ]
-        };
-
-        const url = `${USER_API_URL}&filters=${encodeURIComponent(JSON.stringify(filter))}`;
-
-        const res = await fetch(url, {
-            headers: { Authorization: `Token ${BASEROW_TOKEN}` }
-        });
-
-        const data = await res.json();
-
-        if (data.results?.length) {
-            const row = data.results[0];
-            document.getElementById("userName").textContent = row[USER_NAME_FIELD] || "User";
-        } else {
-            document.getElementById("userName").textContent = "User";
+        // Utility - safe currency formatter
+        function formatCurrency(value) {
+            const n = Number(value);
+            if (!isFinite(n)) return "$0.0000";
+            return `$${n.toFixed(4)}`;
         }
 
-    } catch (e) {
-        console.error("Name load fail:", e);
-        document.getElementById("userName").textContent = "User";
-    }
-}
+        // ---------- INIT ----------
+        window.addEventListener('DOMContentLoaded', async () => {
+            const userEmail = localStorage.getItem("v0trade_user_email");
 
-/* ==========================
-   LOAD WALLET DATA
-========================== */
-async function loadWallet(email) {
-    try {
-        const filter = {
-            filter_type: "AND",
-            filters: [
-                { type: "equal", field: FIELD_EMAIL, value: email }
-            ]
-        };
+            // If not logged in, redirect to login
+            if (!userEmail) {
+                // If you want to allow viewing without being logged in, remove this redirect.
+                window.location.href = "login.html";
+                return;
+            }
 
-        const url = `${WALLET_API_URL}&filters=${encodeURIComponent(JSON.stringify(filter))}`;
+            // show email in header & welcome card
+            const headerEmailEl = document.getElementById('headerEmailDisplay');
+            const userEmailEl = document.getElementById('userEmailDisplay');
+            if (headerEmailEl) headerEmailEl.textContent = userEmail;
+            if (userEmailEl) userEmailEl.textContent = userEmail;
 
-        const res = await fetch(url, {
-            headers: { Authorization: `Token ${BASEROW_TOKEN}` }
+            // fetch user name + wallet data in parallel
+            await Promise.all([
+                fetchUserNameAndShow(userEmail),
+                fetchWalletDataAndShow(userEmail)
+            ]);
         });
 
-        const data = await res.json();
+        // Fetch the user's name from USERS table (table 755975) and display it
+        async function fetchUserNameAndShow(email) {
+            try {
+                // Build filter JSON and URL-encode it
+                const filterObj = {
+                    filter_type: "AND",
+                    filters: [
+                        { type: "equal", field: "Email", value: email }
+                    ]
+                };
+                const url = `${USER_API_URL}&filters=${encodeURIComponent(JSON.stringify(filterObj))}`;
 
-        if (!data.results?.length) {
-            showZeros();
-            return;
+                const res = await fetch(url, {
+                    headers: {
+                        "Authorization": `Token ${BASEROW_TOKEN}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!res.ok) {
+                    console.error("Failed to fetch user name:", res.status, res.statusText);
+                    setUserNameFallback();
+                    return;
+                }
+
+                const data = await res.json();
+
+                if (data.results && data.results.length > 0) {
+                    const userRow = data.results[0];
+                    // use the field id you specified
+                    const name = userRow[USER_NAME_FIELD] || userRow['Name'] || "User";
+                    const userNameEl = document.getElementById('userName');
+                    if (userNameEl) userNameEl.textContent = name;
+                } else {
+                    setUserNameFallback();
+                }
+            } catch (err) {
+                console.error("Error fetching user name:", err);
+                setUserNameFallback();
+            }
         }
 
-        const w = data.results[0];
+        function setUserNameFallback() {
+            const userNameEl = document.getElementById('userName');
+            if (userNameEl) userNameEl.textContent = "User";
+        }
 
-        // Correct field → UI mapping
-        document.getElementById("depositBalance").textContent =
-            formatMoney(w[FIELD_TOTAL_WALLET]);       // Total Wallet Balance (total_earnings)
+        // Fetch wallet data by matching the email in the wallets table
+        async function fetchWalletDataAndShow(email) {
+            try {
+                const filterObj = {
+                    filter_type: "AND",
+                    filters: [
+                        { type: "equal", field: FIELD_EMAIL_IN_WALLETS, value: email }
+                    ]
+                };
+                const url = `${WALLET_API_URL}&filters=${encodeURIComponent(JSON.stringify(filterObj))}`;
 
-        document.getElementById("earningBalance").textContent =
-            formatMoney(w[FIELD_DEPOSIT_BALANCE]);    // All Earning Wallet
+                const res = await fetch(url, {
+                    headers: {
+                        "Authorization": `Token ${BASEROW_TOKEN}`,
+                        "Content-Type": "application/json"
+                    }
+                });
 
-        document.getElementById("totalReturned").textContent =
-            formatMoney(w[FIELD_MINER_EARNING]);      // Miner Earning
+                if (!res.ok) {
+                    console.error("Failed to fetch wallet data:", res.status, res.statusText);
+                    showZeroBalances();
+                    return;
+                }
 
-        document.getElementById("totalCommissions").textContent =
-            formatMoney(w[FIELD_TOTAL_COMM]);         // Commissions
+                const data = await res.json();
 
-        document.getElementById("totalEarnings").textContent =
-            formatMoney(w[FIELD_INVEST_EARN]);        // Investment Earning
+                if (data.results && data.results.length > 0) {
+                    const wallet = data.results[0];
 
-    } catch (e) {
-        console.error("Wallet load fail:", e);
-        showZeros();
-    }
-}
+                    // Map fields to UI
+                    const depositTotal = wallet[FIELD_TOTAL_WALLET] ?? 0; // total_earnings -> depositBalance card
+                    const allEarning   = wallet[FIELD_DEPOSIT_BALANCE] ?? 0; // deposit_balance -> earningBalance card
+                    const minerReturn  = wallet[FIELD_MINER_EARNING] ?? 0; // total_returned -> totalReturned
+                    const refComms     = wallet[FIELD_TOTAL_COMM] ?? 0; // total_commissions -> totalCommissions
+                    const investEarn   = wallet[FIELD_INVEST_EARN] ?? 0; // earning_balance -> totalEarnings
 
-function showZeros() {
-    [
-        "depositBalance",
-        "earningBalance",
-        "totalReturned",
-        "totalCommissions",
-        "totalEarnings"
-    ].forEach(id => {
-        document.getElementById(id).textContent = "$0.0000";
-    });
-}
+                    // Update UI with safe formatting
+                    const elDeposit = document.getElementById('depositBalance');
+                    const elEarning = document.getElementById('earningBalance');
+                    const elMiner   = document.getElementById('totalReturned');
+                    const elComms   = document.getElementById('totalCommissions');
+                    const elInvest  = document.getElementById('totalEarnings');
 
-/* ==========================
-   SIDEBAR
-========================== */
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('active');
-    document.getElementById('sidebarOverlay').classList.toggle('active');
-}
+                    if (elDeposit) elDeposit.textContent = formatCurrency(depositTotal);
+                    if (elEarning) elEarning.textContent = formatCurrency(allEarning);
+                    if (elMiner)   elMiner.textContent = formatCurrency(minerReturn);
+                    if (elComms)   elComms.textContent = formatCurrency(refComms);
+                    if (elInvest)  elInvest.textContent = formatCurrency(investEarn);
+                } else {
+                    // no wallet row found
+                    console.warn("No wallet row found for:", email);
+                    showZeroBalances();
+                }
+            } catch (err) {
+                console.error("Error fetching wallet data:", err);
+                showZeroBalances();
+            }
+        }
 
-function toggleMobileMenu() {
-    document.getElementById('mobileMenu').classList.toggle('active');
-}
-</script>
+        function showZeroBalances() {
+            const ids = ['depositBalance','earningBalance','totalReturned','totalCommissions','totalEarnings'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '$0.0000';
+            });
+        }
 
+        // Sidebar & mobile toggles
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu) menu.classList.toggle('active');
+        }
+    </script>
 </body>
 </html>
